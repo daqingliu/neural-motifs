@@ -17,6 +17,9 @@ from config import VG_IMAGES, IM_DATA_FN, VG_SGG_FN, VG_SGG_DICT_FN, BOX_SCALE, 
 from dataloaders.image_transforms import SquarePad, Grayscale, Brightness, Sharpness, Contrast, \
     RandomOrder, Hue, random_crop
 from collections import defaultdict
+
+import sys
+sys.path.append('/home/liudq/SceneGraph/cocoapi/PythonAPI')
 from pycocotools.coco import COCO
 
 

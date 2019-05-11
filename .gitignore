@@ -1,3 +1,9 @@
+data
+_ext/
+checkpoints
+*.o
+motifnet_sgcls
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
