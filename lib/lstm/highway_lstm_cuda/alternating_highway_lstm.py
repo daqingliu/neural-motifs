@@ -60,7 +60,7 @@ def block_orthogonal(tensor, split_sizes, gain=1.0):
 
 
 class _AlternatingHighwayLSTMFunction(Function):
-    def __init__(self, input_size: int, hidden_size: int, num_layers: int, train: bool) -> None:
+    def __init__(self, input_size, hidden_size, num_layers, train):
         super(_AlternatingHighwayLSTMFunction, self).__init__()
         self.input_size = input_size
         self.hidden_size = hidden_size
@@ -69,14 +69,14 @@ class _AlternatingHighwayLSTMFunction(Function):
 
     @overrides
     def forward(self,  # pylint: disable=arguments-differ
-                inputs: torch.Tensor,
-                weight: torch.Tensor,
-                bias: torch.Tensor,
-                state_accumulator: torch.Tensor,
-                memory_accumulator: torch.Tensor,
-                dropout_mask: torch.Tensor,
-                lengths: torch.Tensor,
-                gates: torch.Tensor) -> Tuple[torch.Tensor, None]:
+                inputs,
+                weight,
+                bias,
+                state_accumulator,
+                memory_accumulator,
+                dropout_mask,
+                lengths,
+                gates):
         sequence_length, batch_size, input_size = inputs.size()
         tmp_i = inputs.new(batch_size, 6 * self.hidden_size)
         tmp_h = inputs.new(batch_size, 5 * self.hidden_size)
@@ -193,10 +193,10 @@ class AlternatingHighwayLSTM(torch.nn.Module):
     """
 
     def __init__(self,
-                 input_size: int,
-                 hidden_size: int,
-                 num_layers: int = 1,
-                 recurrent_dropout_probability: float = 0) -> None:
+                 input_size,
+                 hidden_size,
+                 num_layers = 1,
+                 recurrent_dropout_probability = 0):
         super(AlternatingHighwayLSTM, self).__init__()
         self.input_size = input_size
         self.hidden_size = hidden_size
@@ -228,9 +228,9 @@ class AlternatingHighwayLSTM(torch.nn.Module):
 
         self.weight = Parameter(torch.FloatTensor(total_weight_size))
         self.bias = Parameter(torch.FloatTensor(total_bias_size))
-        self.reset_parameters()
+        # self.reset_parameters()
 
-    def reset_parameters(self) -> None:
+    def reset_parameters(self):
         self.bias.data.zero_()
         weight_index = 0
         bias_index = 0
@@ -256,7 +256,7 @@ class AlternatingHighwayLSTM(torch.nn.Module):
             self.bias.data[bias_index + self.hidden_size:bias_index + 2 * self.hidden_size].fill_(1)
             bias_index += 5 * self.hidden_size
 
-    def forward(self, inputs, initial_state=None) -> Tuple[PackedSequence, torch.Tensor]:
+    def forward(self, inputs, initial_state=None):
         """
         Parameters
         ----------
@@ -274,7 +274,7 @@ class AlternatingHighwayLSTM(torch.nn.Module):
             (num_layers, batch_size, hidden_size).
         """
         inputs, lengths = pad_packed_sequence(inputs, batch_first=False)
-
+        import pdb;  pdb.set_trace()
         sequence_length, batch_size, _ = inputs.size()
         accumulator_shape = [self.num_layers, sequence_length + 1, batch_size, self.hidden_size]
         state_accumulator = Variable(inputs.data.new(*accumulator_shape).zero_(), requires_grad=False)

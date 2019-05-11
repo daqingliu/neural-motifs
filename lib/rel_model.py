@@ -1,3 +1,6 @@
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
 """
 Let's get the relationships yo
 """
@@ -39,7 +42,7 @@ def _sort_by_score(im_inds, scores):
              Lengths for the TxB packed sequence.
     """
     num_im = im_inds[-1] + 1
-    rois_per_image = scores.new(num_im)
+    rois_per_image = scores.new_empty(num_im)
     lengths = []
     for i, s, e in enumerate_by_image(im_inds):
         rois_per_image[i] = 2 * (s - e) * num_im + i
@@ -212,7 +215,7 @@ class LinearizedContext(nn.Module):
         # Pass object features, sorted by score, into the encoder LSTM
         obj_inp_rep = obj_feats[perm].contiguous()
         input_packed = PackedSequence(obj_inp_rep, ls_transposed)
-
+        
         encoder_rep = self.obj_ctx_rnn(input_packed)[0][0]
         # Decode in order
         if self.mode != 'predcls':
@@ -243,7 +246,8 @@ class LinearizedContext(nn.Module):
         :param boxes:
         :return:
         """
-        obj_embed = F.softmax(obj_logits, dim=1) @ self.obj_embed.weight
+        # py3: F.softmax(obj_logits, dim=1) @ self.obj_embed.weight
+        obj_embed = torch.mm(F.softmax(obj_logits, dim=1), self.obj_embed.weight)
         pos_embed = self.pos_embed(Variable(center_size(box_priors)))
         obj_pre_rep = torch.cat((obj_fmaps, obj_embed, pos_embed), 1)
 
@@ -443,7 +447,7 @@ class RelModel(nn.Module):
         :param rois: [num_rois, 5] array of [img_num, x0, y0, x1, y1].
         :return: [num_rois, #dim] array
         """
-        feature_pool = RoIAlignFunction(self.pooling_size, self.pooling_size, spatial_scale=1 / 16)(
+        feature_pool = RoIAlignFunction(self.pooling_size, self.pooling_size, spatial_scale=1.0 / 16.0)(
             features, rois)
         return self.roi_fmap_obj(feature_pool.view(rois.size(0), -1))
 

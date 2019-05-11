@@ -4,6 +4,7 @@ File that involves dataloaders for the Visual Genome dataset.
 
 import json
 import os
+import sys
 
 import h5py
 import numpy as np
@@ -17,6 +18,9 @@ from config import VG_IMAGES, IM_DATA_FN, VG_SGG_FN, VG_SGG_DICT_FN, BOX_SCALE, 
 from dataloaders.image_transforms import SquarePad, Grayscale, Brightness, Sharpness, Contrast, \
     RandomOrder, Hue, random_crop
 from collections import defaultdict
+
+this_dir = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(os.path.join(this_dir, '../lib/cocoapi/PythonAPI'))
 from pycocotools.coco import COCO
 
 
@@ -63,7 +67,7 @@ class VG(Dataset):
         self.ind_to_classes, self.ind_to_predicates = load_info(dict_file)
 
         if use_proposals:
-            print("Loading proposals", flush=True)
+            print("Loading proposals")
             p_h5 = h5py.File(PROPOSAL_FN, 'r')
             rpn_rois = p_h5['rpn_rois']
             rpn_scores = p_h5['rpn_scores']
@@ -391,7 +395,7 @@ def vg_collate(data, num_gpus=3, is_train=False, mode='det'):
     return blob
 
 
-class VGDataLoader(torch.utils.data.DataLoader):
+class VGGDataLoader(torch.utils.data.DataLoader):
     """
     Iterates through the data, filtering out None,
      but also loads everything as a (cuda) variable
@@ -408,9 +412,7 @@ class VGDataLoader(torch.utils.data.DataLoader):
             num_workers=num_workers,
             collate_fn=lambda x: vg_collate(x, mode=mode, num_gpus=num_gpus, is_train=True),
             drop_last=True,
-            # pin_memory=True,
-            **kwargs,
-        )
+            **kwargs)
         val_load = cls(
             dataset=val_data,
             batch_size=batch_size * num_gpus if mode=='det' else num_gpus,
@@ -418,7 +420,5 @@ class VGDataLoader(torch.utils.data.DataLoader):
             num_workers=num_workers,
             collate_fn=lambda x: vg_collate(x, mode=mode, num_gpus=num_gpus, is_train=False),
             drop_last=True,
-            # pin_memory=True,
-            **kwargs,
-        )
+            **kwargs)
         return train_load, val_load

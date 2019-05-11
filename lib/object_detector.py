@@ -1,3 +1,7 @@
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+
 import numpy as np
 import torch
 import torch.nn as nn
@@ -398,7 +402,7 @@ class ObjectDetector(nn.Module):
                 dets.append(d_filtered)
 
         if len(dets) == 0:
-            print("nothing was detected", flush=True)
+            print("nothing was detected")
             return None
         nms_inds, nms_scores, nms_labels = [torch.cat(x, 0) for x in zip(*dets)]
         twod_inds = nms_inds * boxes.size(1) + nms_labels.data

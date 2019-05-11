@@ -47,6 +47,7 @@ class FrequencyBias(nn.Module):
         joint_cands = obj_cands0[:, :, None] * obj_cands1[:, None]
 
         # [151, 151, 51] of targets per.
-        baseline = joint_cands.view(joint_cands.size(0), -1) @ self.obj_baseline.weight
+        # py3: baseline = joint_cands.view(joint_cands.size(0), -1) @ self.obj_baseline.weight
+        baseline = torch.mm(joint_cands.view(joint_cands.size(0), -1), self.obj_baseline.weight)
 
         return baseline

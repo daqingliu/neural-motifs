@@ -1,5 +1,3 @@
-export PATH := /usr/local/cuda-9.1/bin:$(PATH)
-
 all: draw_rectangles box_intersections nms roi_align lstm
 
 draw_rectangles:

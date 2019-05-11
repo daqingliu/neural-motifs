@@ -1,7 +1,8 @@
-
-from dataloaders.visual_genome import VGDataLoader, VG
 import numpy as np
 import torch
+
+import os
+from dataloaders.visual_genome import VGGDataLoader, VG
 
 from config import ModelConfig
 from lib.pytorch_misc import optimistic_restore
@@ -9,7 +10,9 @@ from lib.evaluation.sg_eval import BasicSceneGraphEvaluator
 from tqdm import tqdm
 from config import BOX_SCALE, IM_SCALE
 import dill as pkl
-import os
+
+os.environ["CUDA_VISIBLE_DEVICES"] = '0'
+
 
 conf = ModelConfig()
 if conf.model == 'motifnet':
@@ -24,7 +27,7 @@ train, val, test = VG.splits(num_val_im=conf.val_size, filter_duplicate_rels=Tru
                           filter_non_overlap=conf.mode == 'sgdet')
 if conf.test:
     val = test
-train_loader, val_loader = VGDataLoader.splits(train, val, mode='rel',
+train_loader, val_loader = VGGDataLoader.splits(train, val, mode='rel',
                                                batch_size=conf.batch_size,
                                                num_workers=conf.num_workers,
                                                num_gpus=conf.num_gpus)

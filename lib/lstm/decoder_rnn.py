@@ -10,7 +10,7 @@ from lib.word_vectors import obj_edge_vectors
 from .highway_lstm_cuda.alternating_highway_lstm import block_orthogonal
 import numpy as np
 
-def get_dropout_mask(dropout_probability: float, tensor_for_masking: torch.autograd.Variable):
+def get_dropout_mask(dropout_probability, tensor_for_masking):
     """
     Computes and returns an element-wise dropout mask for a given tensor, where
     each element in the mask is dropped out with probability dropout_probability.
@@ -77,7 +77,7 @@ class DecoderRNN(torch.nn.Module):
                                                    bias=True)
 
         self.out = nn.Linear(self.hidden_size, len(self.classes))
-        self.reset_parameters()
+        # self.reset_parameters()
 
     @property
     def input_size(self):
@@ -131,8 +131,8 @@ class DecoderRNN(torch.nn.Module):
         return timestep_output, memory
 
     def forward(self,  # pylint: disable=arguments-differ
-                inputs: PackedSequence,
-                initial_state: Optional[Tuple[torch.Tensor, torch.Tensor]] = None,
+                inputs,
+                initial_state=None,
                 labels=None, boxes_for_nms=None):
         """
         Parameters

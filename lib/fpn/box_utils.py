@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*
+
 import torch
 import numpy as np
 from torch.nn import functional as F
@@ -32,7 +34,7 @@ def bbox_preds(boxes, deltas):
     :param boxes: Prior boxes, represented as (x1, y1, x2, y2)
     :param deltas: Offsets (tx, ty, tw, th)
     :param box_strides [num_boxes,] distance apart between boxes. anchor box can't go more than
-       \pm box_strides/2 from its current position. If None then we'll use the widths
+       pm box_strides/2 from its current position. If None then we'll use the widths
        and heights
     :return: Transformed boxes
     """

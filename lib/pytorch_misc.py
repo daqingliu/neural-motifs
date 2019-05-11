@@ -450,7 +450,7 @@ def clip_grad_norm(named_parameters, max_norm, clip=False, verbose=False):
         print('---Total norm {:.3f} clip coef {:.3f}-----------------'.format(total_norm, clip_coef))
         for name, norm in sorted(param_to_norm.items(), key=lambda x: -x[1]):
             print("{:<50s}: {:.3f}, ({})".format(name, norm, param_to_shape[name]))
-        print('-------------------------------', flush=True)
+        print('-------------------------------')
 
     return total_norm
 
